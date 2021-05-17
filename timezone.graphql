@@ -1,0 +1,42 @@
+type Timezone {
+  countryCode: String
+  countryName: String
+  zoneName: String!
+  abbreviation: String
+  gmtOffset: Int!
+  dst: Int
+  zoneStart: Int
+  zoneEnd: Int
+  nextAbbreviation: String
+  timestamp: Int
+  timestring: String
+  formatted: Date
+}
+
+type Query {
+  getTimezoneByLatLong(latitude: Float!, longitude: Float!): Timezone
+    @rest(
+      endpoint: "http://api.timezonedb.com/v2.1/get-time-zone?format=json&key=$api_key&by=position&lat=$latitude&lng=$longitude"
+      configuration: "timezone_config"
+    )
+  convertTimeFromUTC(abbreviation: String!, time: Int!): Timezone
+    @rest(
+      endpoint: "http://api.timezonedb.com/v2.1/convert-time-zone?key=$api_key&from=UTC&to=$abbreviation&format=json&time=$time"
+      configuration: "timezone_config"
+      setters: [
+        { field: "abbreviation", path: "toAbbreviation" }
+        { field: "zoneName", path: "toZoneName" }
+        { field: "timestamp", path: "toTimestamp" }
+        { field: "gmtOffset", path: "offset" }
+      ]
+      cel: """
+      function transformREST(json)
+        {
+            let data = JSON.parse(json)
+            let date = new Date(data.toTimestamp * 1000)
+            data.timestring =date.toString()
+            return JSON.stringify(data)
+        }
+      """
+    )
+}

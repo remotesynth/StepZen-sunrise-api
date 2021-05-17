@@ -1,0 +1,54 @@
+type SunriseSunset {
+  sunrise: String!
+  sunset: String!
+  solar_noon: String!
+  day_length: String!
+  civil_twilight_begin: String!
+  civil_twilight_end: String!
+  nautical_twilight_begin: String!
+  nautical_twilight_end: String!
+  astronomical_twilight_begin: String!
+  astronomical_twilight_end: String!
+  sunrise_unix: Int
+  sunset_unix: Int
+}
+
+type Query {
+  getSunriseByLatLong(latitude: Float!, longitude: Float!): SunriseSunset
+    @rest(
+      endpoint: "https://api.sunrise-sunset.org/json?lat=$latitude&lng=$longitude"
+      resultroot: "results"
+      cel: """
+      function transformREST(json)
+      {
+          let data = JSON.parse(json)
+          let today = new Date()
+          let today_string = today.getFullYear()+'-'+('0' + (today.getMonth() + 1)).slice(-2)+'-'+today.getDate()
+          // sunrise
+          let sunrise_hour = data.results.sunrise.split(':')[0]
+          if (data.results.sunrise.split(-2) == 'PM')
+            sunrise_hour = sunrise_hour + 12;
+          let sunrise_minute = data.results.sunrise.split(':')[1]
+          let sunrise_seconds = data.results.sunrise.split(':')[2].slice(0,2)
+          let sunrise = today_string+'T'+sunrise_hour+':'+sunrise_minute+':'+sunrise_seconds+'+00:00'
+          let sunrise_dt = new Date(sunrise)
+          // sunset
+          let sunset_hour = data.results.sunset.split(':')[0]
+          if (data.results.sunset.split(-2) == 'PM')
+            sunset_hour = sunset_hour + 12;
+          let sunset_minute = data.results.sunset.split(':')[1]
+          let sunset_seconds = data.results.sunset.split(':')[2].slice(0,2)
+          let sunset = today_string+'T'+sunset_hour+':'+sunset_minute+':'+sunset_seconds+'+00:00'
+          let sunset_dt = new Date(sunset)
+
+          data.results.sunrise_unix = sunrise_dt.getTime()/1000
+          data.results.sunset_unix = sunset_dt.getTime()/1000
+          return JSON.stringify(data)
+      }
+      """
+    )
+  getSunriseByIp(ip_address: String!): SunriseSunset
+    @sequence(
+      steps: [{ query: "getLocationByIp" }, { query: "getSunriseByLatLong" }]
+    )
+}

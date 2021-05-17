@@ -1,0 +1,27 @@
+type Geolocation {
+  ip_address: String!
+  city: String
+  city_geoname_id: Int
+  region: String
+  region_iso_code: String
+  region_geoname_id: Int
+  postal_code: String
+  country: String
+  country_code: String
+  country_geoname_id: Int
+  country_is_eu: Boolean
+  continent: String
+  continent_code: String
+  continent_geoname_id: Int
+  longitude: Float
+  latitude: Float
+  timezone: Timezone @materializer(query: "getTimezoneByLatLong")
+}
+
+type Query {
+  getLocationByIp(ip_address: String!): Geolocation
+    @rest(
+      endpoint: "https://ipgeolocation.abstractapi.com/v1/?api_key=$api_key&ip_address=$ip_address"
+      configuration: "abstractapi_config"
+    )
+}
