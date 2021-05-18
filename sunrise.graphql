@@ -13,7 +13,7 @@ type SunriseSunset {
   sunrise_local: String
   sunset_unix: Int
   sunset_local: String
-  abbreviation: String
+  timezone: String
 }
 
 type Query {
@@ -55,7 +55,10 @@ type Query {
       steps: [
         { query: "getLocationByIp" }
         { query: "getSunriseByLatLong" }
-        { query: "collectSunrise" }
+        {
+          query: "collectSunrise"
+          arguments: [{ name: "abbreviation", field: "timezone" }]
+        }
       ]
     )
   collectSunrise(
@@ -73,6 +76,6 @@ type Query {
     sunrise_local: String
     sunset_unix: Int
     sunset_local: String
-    abbreviation: String
+    timezone: String
   ): SunriseSunset @connector(type: "echo")
 }
