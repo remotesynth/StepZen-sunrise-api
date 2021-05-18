@@ -10,14 +10,27 @@ type SunriseSunset {
   astronomical_twilight_begin: String!
   astronomical_twilight_end: String!
   sunrise_unix: Int
-  sunrise_local: String
   sunset_unix: Int
-  sunset_local: String
-  timezone: String
+  abbreviation: String
+}
+
+type SunriseSunsetFoo {
+  sunrise: String!
+  sunset: String!
+  solar_noon: String!
+  day_length: String!
+  civil_twilight_begin: String!
+  civil_twilight_end: String!
+  nautical_twilight_begin: String!
+  nautical_twilight_end: String!
+  astronomical_twilight_begin: String!
+  astronomical_twilight_end: String!
+  sunrise_unix: Int
+  sunset_unix: Int
 }
 
 type Query {
-  getSunriseByLatLong(latitude: Float!, longitude: Float!): SunriseSunset
+  getSunriseByLatLong(latitude: Float!, longitude: Float!): SunriseSunsetFoo
     @rest(
       endpoint: "https://api.sunrise-sunset.org/json?lat=$latitude&lng=$longitude"
       resultroot: "results"
@@ -55,10 +68,7 @@ type Query {
       steps: [
         { query: "getLocationByIp" }
         { query: "getSunriseByLatLong" }
-        {
-          query: "collectSunrise"
-          arguments: [{ name: "abbreviation", field: "timezone" }]
-        }
+        { query: "collectSunrise" }
       ]
     )
   collectSunrise(
@@ -76,6 +86,6 @@ type Query {
     sunrise_local: String
     sunset_unix: Int
     sunset_local: String
-    timezone: String
+    abbreviation: String
   ): SunriseSunset @connector(type: "echo")
 }
