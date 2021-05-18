@@ -13,6 +13,7 @@ type SunriseSunset {
   sunrise_local: String
   sunset_unix: Int
   sunset_local: String
+  abbreviation: String
 }
 
 type Query {
@@ -51,6 +52,27 @@ type Query {
     )
   getSunriseByIp(ip_address: String!): SunriseSunset
     @sequence(
-      steps: [{ query: "getLocationByIp" }, { query: "getSunriseByLatLong" }]
+      steps: [
+        { query: "getLocationByIp" }
+        { query: "getSunriseByLatLong" }
+        { query: "collectSunrise" }
+      ]
     )
+  collectSunrise(
+    sunrise: String!
+    sunset: String!
+    solar_noon: String!
+    day_length: String!
+    civil_twilight_begin: String!
+    civil_twilight_end: String!
+    nautical_twilight_begin: String!
+    nautical_twilight_end: String!
+    astronomical_twilight_begin: String!
+    astronomical_twilight_end: String!
+    sunrise_unix: Int
+    sunrise_local: String
+    sunset_unix: Int
+    sunset_local: String
+    abbreviation: String
+  ): SunriseSunset @connector(type: "echo")
 }

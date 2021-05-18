@@ -29,10 +29,10 @@ type Query {
       steps: [
         { query: "getLocationByIpAddress" }
         { query: "getTimezoneByLatLong" }
-        { query: "collect" }
+        { query: "collectIp" }
       ]
     )
-  collect(
+  collectIp(
     ip_address: String!
     city: String
     city_geoname_id: Int
