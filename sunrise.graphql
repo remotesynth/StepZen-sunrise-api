@@ -10,7 +10,9 @@ type SunriseSunset {
   astronomical_twilight_begin: String!
   astronomical_twilight_end: String!
   sunrise_unix: Int
+  sunrise_local: String
   sunset_unix: Int
+  sunset_local: String
 }
 
 type Query {
